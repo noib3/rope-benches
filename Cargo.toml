@@ -1,0 +1,27 @@
+[package]
+name = "rope-benches"
+version = "0.1.0"
+edition = "2021"
+
+[dev-dependencies]
+criterion = "0.4"
+crop = { path = "../crop" }
+rand = "0.8"
+ropey = { git = "https://github.com/cessen/ropey", rev = "fcdad3a" }
+xi-rope = { git = "https://github.com/xi-editor/xi-editor", rev = "d027769" }
+
+[[bench]]
+name = "creation"
+harness = false
+
+[[bench]]
+name = "editing"
+harness = false
+
+[[bench]]
+name = "iterators"
+harness = false
+
+[[bench]]
+name = "slicing"
+harness = false
