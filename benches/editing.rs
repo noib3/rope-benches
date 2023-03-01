@@ -40,6 +40,33 @@ impl Rope for crop::Rope {
     }
 }
 
+impl Rope for jumprope::JumpRope {
+    #[inline]
+    fn from_str(s: &str) -> Self {
+        Self::from(s)
+    }
+
+    #[inline]
+    fn len(&self) -> usize {
+        self.len_bytes()
+    }
+
+    #[inline]
+    fn insert(&mut self, at_byte: usize, text: &str) {
+        self.insert(at_byte, text);
+    }
+
+    #[inline]
+    fn delete(&mut self, byte_range: Range<usize>) {
+        self.remove(byte_range);
+    }
+
+    #[inline]
+    fn replace(&mut self, byte_range: Range<usize>, text: &str) {
+        self.replace(byte_range, text);
+    }
+}
+
 impl Rope for ropey::Rope {
     #[inline]
     fn from_str(s: &str) -> Self {
@@ -325,6 +352,60 @@ fn xi_rope_replace_large(c: &mut Criterion) {
     bench_replace::<xi_rope::Rope>(&mut group, SMALL);
 }
 
+fn jumprope_insert_char(c: &mut Criterion) {
+    let mut group = c.benchmark_group("jumprope_insert_char");
+    bench_insert::<jumprope::JumpRope>(&mut group, "a");
+}
+
+fn jumprope_insert_sentence(c: &mut Criterion) {
+    let mut group = c.benchmark_group("jumprope_insert_sentence");
+    bench_insert::<jumprope::JumpRope>(
+        &mut group,
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    );
+}
+
+fn jumprope_insert_large(c: &mut Criterion) {
+    let mut group = c.benchmark_group("jumprope_insert_large");
+    bench_insert::<jumprope::JumpRope>(&mut group, SMALL);
+}
+
+fn jumprope_delete_char(c: &mut Criterion) {
+    let mut group = c.benchmark_group("jumprope_delete_char");
+    bench_delete::<jumprope::JumpRope>(&mut group, "a".len());
+}
+
+fn jumprope_delete_sentence(c: &mut Criterion) {
+    let mut group = c.benchmark_group("jumprope_delete_sentence");
+    bench_delete::<jumprope::JumpRope>(
+        &mut group,
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit.".len(),
+    );
+}
+
+fn jumprope_delete_large(c: &mut Criterion) {
+    let mut group = c.benchmark_group("jumprope_delete_large");
+    bench_delete::<jumprope::JumpRope>(&mut group, SMALL.len());
+}
+
+fn jumprope_replace_char(c: &mut Criterion) {
+    let mut group = c.benchmark_group("jumprope_replace_char");
+    bench_replace::<jumprope::JumpRope>(&mut group, "a");
+}
+
+fn jumprope_replace_sentence(c: &mut Criterion) {
+    let mut group = c.benchmark_group("jumprope_replace_sentence");
+    bench_replace::<jumprope::JumpRope>(
+        &mut group,
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    );
+}
+
+fn jumprope_replace_large(c: &mut Criterion) {
+    let mut group = c.benchmark_group("jumprope_replace_large");
+    bench_replace::<jumprope::JumpRope>(&mut group, SMALL);
+}
+
 criterion_group!(
     benches,
     crop_insert_char,
@@ -336,6 +417,15 @@ criterion_group!(
     crop_replace_char,
     crop_replace_sentence,
     crop_replace_large,
+    jumprope_insert_char,
+    jumprope_insert_sentence,
+    jumprope_insert_large,
+    jumprope_delete_char,
+    jumprope_delete_sentence,
+    jumprope_delete_large,
+    jumprope_replace_char,
+    jumprope_replace_sentence,
+    jumprope_replace_large,
     ropey_insert_char,
     ropey_insert_sentence,
     ropey_insert_large,

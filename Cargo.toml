@@ -5,7 +5,8 @@ edition = "2021"
 
 [dev-dependencies]
 criterion = "0.4"
-crop = { path = "../crop" }
+crop = { git = "https://github.com/noib3/crop", rev = "954586b" }
+jumprope = { git = "https://github.com/josephg/jumprope-rs", rev = "f26a850" }
 rand = "0.8"
 ropey = { git = "https://github.com/cessen/ropey", rev = "fcdad3a" }
 xi-rope = { git = "https://github.com/xi-editor/xi-editor", rev = "d027769" }

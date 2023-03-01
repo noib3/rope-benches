@@ -12,13 +12,18 @@ trait RopeBuilder {
     type Rope: Rope;
 
     fn new() -> Self;
-
     fn append(self, s: &str) -> Self;
-
     fn build(self) -> Self::Rope;
 }
 
 impl Rope for crop::Rope {
+    #[inline]
+    fn from_str(s: &str) -> Self {
+        Self::from(s)
+    }
+}
+
+impl Rope for jumprope::JumpRope {
     #[inline]
     fn from_str(s: &str) -> Self {
         Self::from(s)
@@ -127,6 +132,11 @@ fn crop_from_str(c: &mut Criterion) {
     bench(&mut group, from_str::<crop::Rope>);
 }
 
+fn jumprope_from_str(c: &mut Criterion) {
+    let mut group = c.benchmark_group("jumprope_from_str");
+    bench(&mut group, from_str::<jumprope::JumpRope>);
+}
+
 fn ropey_from_str(c: &mut Criterion) {
     let mut group = c.benchmark_group("ropey_from_str");
     bench(&mut group, from_str::<ropey::Rope>);
@@ -155,6 +165,7 @@ fn xi_rope_builder(c: &mut Criterion) {
 criterion_group!(
     benches,
     crop_from_str,
+    jumprope_from_str,
     ropey_from_str,
     xi_rope_from_str,
     crop_builder,
