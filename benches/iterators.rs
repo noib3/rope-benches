@@ -37,7 +37,9 @@ trait Rope {
         unimplemented!();
     }
 
-    fn lines(&self) -> Self::Lines<'_>;
+    fn lines(&self) -> Self::Lines<'_> {
+        unimplemented!();
+    }
 }
 
 impl Rope for crop::Rope {
@@ -72,6 +74,14 @@ impl Rope for crop::Rope {
         self.lines()
     }
 }
+
+// impl Rope for jumprope::JumpRope {
+//     type Chunks<'a> = XiRopeChunks<'a>;
+//     type Bytes<'a> = std::str::Bytes<'a>;
+//     type Chars<'a> = std::str::Chars<'a>;
+//     type Line<'a> = std::borrow::Cow<'a, str>;
+//     type Lines<'a> = XiRopeLines<'a>;
+// }
 
 impl Rope for ropey::Rope {
     type Chunks<'a> = ropey::iter::Chunks<'a>;
@@ -189,10 +199,8 @@ fn bench_chunks<R: Rope>(group: &mut BenchmarkGroup<WallTime>) {
     #[inline]
     fn bench<R: Rope>(bench: &mut Bencher, s: &str) {
         let r = R::from_str(s);
-        let mut chunks = r.chunks().cycle();
-        bench.iter(|| {
-            let _ = chunks.next();
-        });
+        let chunks = r.chunks();
+        bench.iter(|| for _chunk in chunks.clone() {});
     }
 
     group.bench_function("create", |bench| {
@@ -296,6 +304,16 @@ fn crop_iter_lines(c: &mut Criterion) {
     bench_lines::<crop::Rope>(&mut group);
 }
 
+// fn jumprope_iter_chunks(c: &mut Criterion) {
+//     let mut group = c.benchmark_group("jumprope_iter_chunks");
+//     bench_chunks::<jumprope::JumpRope>(&mut group);
+// }
+
+// fn jumprope_iter_chars(c: &mut Criterion) {
+//     let mut group = c.benchmark_group("jumprope_iter_chars");
+//     bench_chunks::<jumprope::JumpRope>(&mut group);
+// }
+
 fn ropey_iter_chunks(c: &mut Criterion) {
     let mut group = c.benchmark_group("ropey_iter_chunks");
     bench_chunks::<ropey::Rope>(&mut group);
@@ -332,6 +350,8 @@ criterion_group!(
     crop_iter_bytes,
     crop_iter_chars,
     crop_iter_lines,
+    // jumprope_iter_chunks,
+    // jumprope_iter_chars,
     ropey_iter_chunks,
     ropey_iter_bytes,
     ropey_iter_chars,
