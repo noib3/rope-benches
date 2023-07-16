@@ -1,8 +1,10 @@
 use std::ops::Range;
 
-pub trait Rope: for<'a> From<&'a str> {
+pub trait Rope {
     const NAME: &'static str;
     const EDITS_USE_BYTE_OFFSETS: bool = false;
+
+    fn from_str(s: &str) -> Self;
 
     fn insert(&mut self, at_offset: usize, text: &str);
 
@@ -32,6 +34,11 @@ impl Rope for String {
     const EDITS_USE_BYTE_OFFSETS: bool = true;
 
     #[inline(always)]
+    fn from_str(s: &str) -> Self {
+        s.into()
+    }
+
+    #[inline(always)]
     fn insert(&mut self, at: usize, s: &str) {
         self.insert_str(at, s);
     }
@@ -57,6 +64,11 @@ impl Rope for crop::Rope {
     const EDITS_USE_BYTE_OFFSETS: bool = true;
 
     #[inline(always)]
+    fn from_str(s: &str) -> Self {
+        s.into()
+    }
+
+    #[inline(always)]
     fn insert(&mut self, at: usize, s: &str) {
         self.insert(at, s);
     }
@@ -79,6 +91,11 @@ impl Rope for crop::Rope {
 
 impl Rope for jumprope::JumpRope {
     const NAME: &'static str = "JumpRope";
+
+    #[inline(always)]
+    fn from_str(s: &str) -> Self {
+        s.into()
+    }
 
     #[inline(always)]
     fn insert(&mut self, at: usize, s: &str) {
@@ -107,6 +124,11 @@ impl Rope for jumprope::JumpRopeBuf {
     const NAME: &'static str = "JumpBufRope";
 
     #[inline(always)]
+    fn from_str(s: &str) -> Self {
+        s.into()
+    }
+
+    #[inline(always)]
     fn insert(&mut self, at: usize, s: &str) {
         self.insert(at, s);
     }
@@ -124,6 +146,11 @@ impl Rope for jumprope::JumpRopeBuf {
 
 impl Rope for ropey::Rope {
     const NAME: &'static str = "Ropey";
+
+    #[inline(always)]
+    fn from_str(s: &str) -> Self {
+        s.into()
+    }
 
     #[inline(always)]
     fn insert(&mut self, at: usize, s: &str) {
@@ -146,6 +173,11 @@ impl Rope for xi_rope::Rope {
     const EDITS_USE_BYTE_OFFSETS: bool = true;
 
     #[inline(always)]
+    fn from_str(s: &str) -> Self {
+        s.into()
+    }
+
+    #[inline(always)]
     fn insert(&mut self, at: usize, s: &str) {
         self.edit(at..at, s);
     }
@@ -163,54 +195,5 @@ impl Rope for xi_rope::Rope {
     #[inline(always)]
     fn len(&self) -> usize {
         self.len()
-    }
-}
-
-pub struct DT {
-    oplog: diamond_types::list::OpLog,
-    agent: u32,
-    encode_from: usize,
-}
-
-impl From<&str> for DT {
-    #[inline(always)]
-    fn from(s: &str) -> Self {
-        let mut oplog = diamond_types::list::OpLog::new();
-        let agent = oplog.get_or_create_agent_id("DT");
-        let time = oplog.add_insert(agent, 0, s);
-        Self {
-            oplog,
-            agent,
-            encode_from: time,
-        }
-    }
-}
-
-impl Rope for DT {
-    const NAME: &'static str = "DT";
-
-    #[inline(always)]
-    fn insert(&mut self, at: usize, s: &str) {
-        let time = self.oplog.add_insert(self.agent, at, s);
-        let _ = self.oplog.encode_from(
-            diamond_types::list::encoding::EncodeOptions::default(),
-            &[self.encode_from],
-        );
-        self.encode_from = time;
-    }
-
-    #[inline(always)]
-    fn remove(&mut self, range: Range<usize>) {
-        let time = self.oplog.add_delete_without_content(self.agent, range);
-        let _ = self.oplog.encode_from(
-            diamond_types::list::encoding::EncodeOptions::default(),
-            &[self.encode_from],
-        );
-        self.encode_from = time;
-    }
-
-    #[inline(always)]
-    fn len(&self) -> usize {
-        self.oplog.checkout_tip().len()
     }
 }

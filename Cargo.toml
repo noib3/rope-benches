@@ -5,12 +5,11 @@ edition = "2021"
 
 [dependencies]
 crdt-testdata = { git = "https://github.com/josephg/jumprope-rs", rev = "ae2a3f3" }
-criterion = "0.4"
-crop = "0.3"
-diamond-types = "1.0"
-jumprope = { git = "https://github.com/josephg/jumprope-rs", rev = "ae2a3f3" }
-ropey = { git = "https://github.com/cessen/ropey", rev = "fcdad3a", default-features = false, features = ["simd"] }
-xi-rope = { git = "https://github.com/xi-editor/xi-editor", rev = "d027769" }
+criterion = "0.5"
+crop = { git = "https://github.com/noib3/crop" }
+jumprope = { git = "https://github.com/josephg/jumprope-rs" }
+ropey = { git = "https://github.com/cessen/ropey", default-features = false, features = ["simd"] }
+xi-rope = { git = "https://github.com/xi-editor/xi-editor" }
 
 [[bench]]
 name = "creation"

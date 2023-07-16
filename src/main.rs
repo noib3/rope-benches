@@ -26,7 +26,7 @@ fn traces(c: &mut Criterion) {
 
         group.bench_function(BenchmarkId::new(trace_file, R::NAME), |b| {
             b.iter(|| {
-                let mut rope = R::from(&trace.start_content);
+                let mut rope = R::from_str(&trace.start_content);
                 for txn in &trace.txns {
                     for TestPatch(pos, del, ins) in &txn.patches {
                         rope.replace(*pos..*pos + del, ins);
@@ -44,7 +44,6 @@ fn traces(c: &mut Criterion) {
         bench::<crop::Rope>(&mut group, trace);
         bench::<jumprope::JumpRope>(&mut group, trace);
         bench::<jumprope::JumpRopeBuf>(&mut group, trace);
-        bench::<rope::DT>(&mut group, trace);
         bench::<ropey::Rope>(&mut group, trace);
         bench::<xi_rope::Rope>(&mut group, trace);
     }
